@@ -41,12 +41,12 @@ public class FixCwe338 extends Recipe {
 
     @Override
     public String getDisplayName() {
-        return "Fix CWE-338 with SecureRandom";
+        return "Fix CWE-338 with `SecureRandom`";
     }
 
     @Override
     public String getDescription() {
-        return "Fix CWE-338: Use of Cryptographically Weak Pseudo-Random Number Generator (PRNG).";
+        return "Use a cryptographically strong pseudo-random number generator (PRNG).";
     }
 
     @Override
