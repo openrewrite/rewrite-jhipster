@@ -3,6 +3,8 @@ package org.openrewrite.java.jhipster;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.Parser;
 import org.openrewrite.Recipe;
+import org.openrewrite.TreeVisitor;
+import org.openrewrite.internal.lang.Nullable;
 import org.openrewrite.java.JavaIsoVisitor;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.java.format.AutoFormat;
@@ -50,7 +52,7 @@ public class FixCwe338 extends Recipe {
     }
 
     @Override
-    protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
+    protected JavaIsoVisitor<ExecutionContext> getSingleSourceApplicableTest() {
         // Look for classes named RandomUtil
         return new JavaIsoVisitor<ExecutionContext>() {
             @Override
