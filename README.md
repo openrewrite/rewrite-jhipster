@@ -8,3 +8,5 @@
 ### What is this?
 
 This project implements a [Rewrite module](https://github.com/openrewrite/rewrite) that applies best practices and migrations pertaining to the JHipster web application &amp; microservice development platform.
+
+See the [related issue on generator-jhipster](https://github.com/jhipster/generator-jhipster/issues/15068).
