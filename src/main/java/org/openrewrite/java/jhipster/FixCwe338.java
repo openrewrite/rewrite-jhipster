@@ -39,7 +39,6 @@ public class FixCwe338 extends Recipe {
                     .build());
 
     private static final String COMMONS_LANG_2 = "COMMONS_LANG_2";
-    private static final String SECURE_RANDOM_FQN = "java.security.SecureRandom";
 
     @Override
     public String getDisplayName() {
@@ -108,11 +107,11 @@ public class FixCwe338 extends Recipe {
                                 "    SECURE_RANDOM.nextBytes(new byte[64]);\n" +
                                 "}\n"
                         )
-                                .javaParser(JAVA_PARSER.get())
-                                .imports(SECURE_RANDOM_FQN)
+                                .javaParser(JAVA_PARSER::get)
+                                .imports("java.security.SecureRandom")
                                 .build(),
                         cd.getBody().getCoordinates().lastStatement()));
-                maybeAddImport(SECURE_RANDOM_FQN);
+                maybeAddImport("java.security.SecureRandom");
 
                 // Move the fields and static initializer newly added statements to the beginning of the class body
                 List<Statement> existingStatements = cd.getBody().getStatements();
@@ -145,7 +144,7 @@ public class FixCwe338 extends Recipe {
             @Override
             public J.MethodInvocation visitMethodInvocation(J.MethodInvocation m, ExecutionContext executionContext) {
                 return m.withTemplate(template("generateRandomAlphanumericString()")
-                                .javaParser(JAVA_PARSER.get())
+                                .javaParser(JAVA_PARSER::get)
                                 .build(),
                         m.getCoordinates().replace());
             }
