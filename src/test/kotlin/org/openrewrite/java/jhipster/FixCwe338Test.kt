@@ -2,9 +2,15 @@ package org.openrewrite.java.jhipster
 
 import org.junit.jupiter.api.Test
 import org.openrewrite.Recipe
+import org.openrewrite.java.JavaParser
 import org.openrewrite.java.JavaRecipeTest
 
 class FixCwe338Test : JavaRecipeTest {
+    override val parser: JavaParser = JavaParser.fromJavaVersion()
+        .logCompilationWarningsAndErrors(false)
+        .classpath("commons-lang", "commons-lang3")
+        .build()
+
     override val recipe: Recipe
         get() = FixCwe338()
 
