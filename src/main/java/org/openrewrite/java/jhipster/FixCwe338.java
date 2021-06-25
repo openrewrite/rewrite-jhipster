@@ -3,10 +3,9 @@ package org.openrewrite.java.jhipster;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.Parser;
 import org.openrewrite.Recipe;
-import org.openrewrite.TreeVisitor;
-import org.openrewrite.internal.lang.Nullable;
 import org.openrewrite.java.JavaIsoVisitor;
 import org.openrewrite.java.JavaParser;
+import org.openrewrite.java.JavaTemplate;
 import org.openrewrite.java.format.AutoFormat;
 import org.openrewrite.java.marker.JavaSearchResult;
 import org.openrewrite.java.tree.J;
@@ -98,7 +97,7 @@ public class FixCwe338 extends Recipe {
                 // Add method, fields, static initializer
                 // Putting the method first because we're going to move the fields & initializer to the start of the class in the next step
                 cd = cd.withBody(cd.getBody().withTemplate(
-                        template("private static String generateRandomAlphanumericString() {\n" +
+                        JavaTemplate.builder(this::getCursor, "private static String generateRandomAlphanumericString() {\n" +
                                 "    return RandomStringUtils.random(DEF_COUNT, 0, 0, true, true, null, SECURE_RANDOM);\n" +
                                 "}\n" +
                                 "private static final SecureRandom SECURE_RANDOM = new SecureRandom();\n" +
@@ -143,7 +142,7 @@ public class FixCwe338 extends Recipe {
 
             @Override
             public J.MethodInvocation visitMethodInvocation(J.MethodInvocation m, ExecutionContext executionContext) {
-                return m.withTemplate(template("generateRandomAlphanumericString()")
+                return m.withTemplate(JavaTemplate.builder(this::getCursor, "generateRandomAlphanumericString()")
                                 .javaParser(JAVA_PARSER::get)
                                 .build(),
                         m.getCoordinates().replace());
