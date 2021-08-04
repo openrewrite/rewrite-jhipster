@@ -78,7 +78,7 @@ public class FixCwe338 extends Recipe {
             public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
                 // If the SECURE_RANDOM field already exists the refactoring has already been completed
                 boolean fieldExists = classDecl.getBody().getStatements().stream()
-                        .filter(it -> it instanceof J.VariableDeclarations)
+                        .filter(J.VariableDeclarations.class::isInstance)
                         .map(J.VariableDeclarations.class::cast)
                         .filter(it -> it.getVariables().size() == 1)
                         .map(it -> it.getVariables().get(0))

@@ -54,7 +54,7 @@ class FixCwe338Test : JavaRecipeTest {
                 }
             }
         """,
-        skipEnhancedTypeValidation = true // fixme
+        typeValidation = { methodInvocations = false }
     )
 
     @Test
@@ -134,6 +134,6 @@ class FixCwe338Test : JavaRecipeTest {
                 }
             }
         """,
-        skipEnhancedTypeValidation = true // fixme
+        typeValidation = { methodInvocations = false }
     )
 }
