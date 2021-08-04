@@ -2,7 +2,7 @@ import nebula.plugin.contacts.Contact
 import nebula.plugin.contacts.ContactsExtension
 import nebula.plugin.release.NetflixOssStrategies.SNAPSHOT
 import nebula.plugin.release.git.base.ReleasePluginExtension
-// import nl.javadude.gradle.plugins.license.LicenseExtension
+import nl.javadude.gradle.plugins.license.LicenseExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.*
 
@@ -16,9 +16,7 @@ plugins {
     id("nebula.release") version "15.3.1"
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
 
-    // for some reason this project has a problem with the licensing plugin
-    // other projects with otherwise similar build files and gradle versions do not
-    //id("com.github.hierynomus.license") version "0.16.1"
+    id("com.github.hierynomus.license") version "0.16.1"
     id("com.github.jk1.dependency-license-report") version "1.16"
 
     id("nebula.maven-publish") version "17.3.2"
@@ -48,7 +46,7 @@ description =
     "Collection of Rewrite Recipes pertaining to the JHipster web application & microservice development platform"
 
 repositories {
-    if(!project.hasProperty("releasing")) {
+    if (!project.hasProperty("releasing")) {
         mavenLocal()
         maven {
             url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
@@ -81,7 +79,7 @@ configurations.all {
     }
 }
 
-val rewriteVersion = if(project.hasProperty("releasing")) {
+val rewriteVersion = if (project.hasProperty("releasing")) {
     "latest.release"
 } else {
     "latest.integration"
@@ -147,13 +145,13 @@ configure<ContactsExtension> {
     people["jkschneider@gmail.com"] = j
 }
 
-// configure<LicenseExtension> {
-//     ext.set("year", Calendar.getInstance().get(Calendar.YEAR))
-//     skipExistingHeaders = true
-//     header = project.rootProject.file("gradle/licenseHeader.txt")
-//     mapping(mapOf("kt" to "SLASHSTAR_STYLE", "java" to "SLASHSTAR_STYLE"))
-//     strictCheck = true
-// }
+configure<LicenseExtension> {
+    ext.set("year", Calendar.getInstance().get(Calendar.YEAR))
+    skipExistingHeaders = true
+    header = project.rootProject.file("gradle/licenseHeader.txt")
+    mapping(mapOf("kt" to "SLASHSTAR_STYLE", "java" to "SLASHSTAR_STYLE"))
+    strictCheck = true
+}
 
 configure<PublishingExtension> {
     publications {
