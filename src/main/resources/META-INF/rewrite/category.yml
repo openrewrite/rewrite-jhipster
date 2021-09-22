@@ -17,4 +17,4 @@
 type: specs.openrewrite.org/v1beta/category
 name: JHipster
 packageName: org.openrewrite.java.jhipster
-description: 'Recipes for upgrading and patching [JHipster](https://www.jhipster.tech/) applications.'
+description: Recipes for upgrading and patching [JHipster](https://www.jhipster.tech/) applications.
