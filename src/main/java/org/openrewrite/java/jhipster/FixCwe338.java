@@ -77,7 +77,7 @@ public class FixCwe338 extends Recipe {
 
             @Override
             public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration cd, ExecutionContext executionContext) {
-                if (cd.getSimpleName().equals("RandomUtil")) {
+                if ("RandomUtil".equals(cd.getSimpleName())) {
                     return cd.withMarkers(cd.getMarkers().searchResult());
                 }
                 return cd;
@@ -96,7 +96,7 @@ public class FixCwe338 extends Recipe {
                         .map(J.VariableDeclarations.class::cast)
                         .filter(it -> it.getVariables().size() == 1)
                         .map(it -> it.getVariables().get(0))
-                        .anyMatch(it -> it.getSimpleName().equals("SECURE_RANDOM"));
+                        .anyMatch(it -> "SECURE_RANDOM".equals(it.getSimpleName()));
                 if (fieldExists) {
                     return classDecl;
                 }
@@ -148,7 +148,7 @@ public class FixCwe338 extends Recipe {
 
             @Override
             public J.Import visitImport(J.Import _import, ExecutionContext executionContext) {
-                if (_import.getPackageName().equals("org.apache.commons.lang")) {
+                if ("org.apache.commons.lang".equals(_import.getPackageName())) {
                     getCursor().putMessage(COMMONS_LANG_2, true);
                 }
                 return _import;
