@@ -112,14 +112,14 @@ public class FixCwe338 extends Recipe {
                 // Putting the method first because we're going to move the fields & initializer to the start of the class in the next step
                 cd = cd.withBody(cd.getBody().withTemplate(
                         JavaTemplate.builder(this::getCursor, "private static String generateRandomAlphanumericString() {\n" +
-                                        "    return RandomStringUtils.random(DEF_COUNT, 0, 0, true, true, null, SECURE_RANDOM);\n" +
-                                        "}\n" +
-                                        "private static final SecureRandom SECURE_RANDOM = new SecureRandom();\n" +
-                                        "private static final int DEF_COUNT = 20;\n\n" +
-                                        "static {\n" +
-                                        "    SECURE_RANDOM.nextBytes(new byte[64]);\n" +
-                                        "}\n"
-                                )
+                                "    return RandomStringUtils.random(DEF_COUNT, 0, 0, true, true, null, SECURE_RANDOM);\n" +
+                                "}\n" +
+                                "private static final SecureRandom SECURE_RANDOM = new SecureRandom();\n" +
+                                "private static final int DEF_COUNT = 20;\n\n" +
+                                "static {\n" +
+                                "    SECURE_RANDOM.nextBytes(new byte[64]);\n" +
+                                "}\n"
+                        )
                                 .javaParser(JAVA_PARSER::get)
                                 .imports("java.security.SecureRandom")
                                 .build(),
