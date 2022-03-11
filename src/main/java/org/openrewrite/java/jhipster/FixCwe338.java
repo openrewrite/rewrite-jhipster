@@ -74,15 +74,15 @@ public class FixCwe338 extends Recipe {
         // Look for classes named RandomUtil
         return new JavaIsoVisitor<ExecutionContext>() {
             @Override
-            public J.CompilationUnit visitCompilationUnit(J.CompilationUnit cu, ExecutionContext executionContext) {
+            public J.CompilationUnit visitCompilationUnit(J.CompilationUnit cu, ExecutionContext ctx) {
                 if (cu.getPackageDeclaration() == null) {
                     return cu;
                 }
-                return super.visitCompilationUnit(cu, executionContext);
+                return super.visitCompilationUnit(cu, ctx);
             }
 
             @Override
-            public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration cd, ExecutionContext executionContext) {
+            public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration cd, ExecutionContext ctx) {
                 if ("RandomUtil".equals(cd.getSimpleName())) {
                     return cd.withMarkers(cd.getMarkers().searchResult());
                 }
@@ -95,7 +95,7 @@ public class FixCwe338 extends Recipe {
     protected JavaIsoVisitor<ExecutionContext> getVisitor() {
         return new JavaIsoVisitor<ExecutionContext>() {
             @Override
-            public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
+            public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext ctx) {
                 // If the SECURE_RANDOM field already exists the refactoring has already been completed
                 boolean fieldExists = classDecl.getBody().getStatements().stream()
                         .filter(J.VariableDeclarations.class::isInstance)
@@ -107,7 +107,7 @@ public class FixCwe338 extends Recipe {
                     return classDecl;
                 }
 
-                J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, executionContext);
+                J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, ctx);
 
                 // Remove any existing fields
                 cd = cd.withBody(cd.getBody().withStatements(cd.getBody().getStatements().stream()
@@ -153,7 +153,7 @@ public class FixCwe338 extends Recipe {
             }
 
             @Override
-            public J.Import visitImport(J.Import _import, ExecutionContext executionContext) {
+            public J.Import visitImport(J.Import _import, ExecutionContext ctx) {
                 if ("org.apache.commons.lang".equals(_import.getPackageName())) {
                     getCursor().putMessage(COMMONS_LANG_2, true);
                 }
@@ -161,7 +161,7 @@ public class FixCwe338 extends Recipe {
             }
 
             @Override
-            public J.MethodInvocation visitMethodInvocation(J.MethodInvocation m, ExecutionContext executionContext) {
+            public J.MethodInvocation visitMethodInvocation(J.MethodInvocation m, ExecutionContext ctx) {
                 return m.withTemplate(JavaTemplate.builder(this::getCursor, "generateRandomAlphanumericString()")
                                 .javaParser(JAVA_PARSER::get)
                                 .build(),
