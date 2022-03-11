@@ -25,6 +25,7 @@ import org.openrewrite.java.format.AutoFormat;
 import org.openrewrite.java.tree.J;
 import org.openrewrite.java.tree.Statement;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -61,6 +62,11 @@ public class FixCwe338 extends Recipe {
     @Override
     public String getDescription() {
         return "Use a cryptographically strong pseudo-random number generator (PRNG).";
+    }
+
+    @Override
+    public Duration getEstimatedEffortPerOccurrence() {
+        return Duration.ofMinutes(5);
     }
 
     @Override
