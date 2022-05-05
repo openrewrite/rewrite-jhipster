@@ -21,6 +21,7 @@ import org.openrewrite.Recipe;
 import org.openrewrite.java.JavaIsoVisitor;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.java.JavaTemplate;
+import org.openrewrite.java.TypeValidation;
 import org.openrewrite.java.format.AutoFormat;
 import org.openrewrite.java.tree.J;
 import org.openrewrite.java.tree.Statement;
@@ -128,6 +129,7 @@ public class FixCwe338 extends Recipe {
                         )
                                 .javaParser(JAVA_PARSER::get)
                                 .imports("java.security.SecureRandom")
+                                .typeValidation(new TypeValidation().methodDeclarations(false).methodInvocations(false))
                                 .build(),
                         cd.getBody().getCoordinates().lastStatement()));
                 maybeAddImport("java.security.SecureRandom");
@@ -164,6 +166,7 @@ public class FixCwe338 extends Recipe {
             public J.MethodInvocation visitMethodInvocation(J.MethodInvocation m, ExecutionContext ctx) {
                 return m.withTemplate(JavaTemplate.builder(this::getCursor, "generateRandomAlphanumericString()")
                                 .javaParser(JAVA_PARSER::get)
+                                .typeValidation(new TypeValidation().methodInvocations(false))
                                 .build(),
                         m.getCoordinates().replace());
             }
