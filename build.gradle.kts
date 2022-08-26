@@ -102,6 +102,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-reflect")
     testImplementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     testImplementation("org.openrewrite:rewrite-java-11:${rewriteVersion}")
+    testImplementation("org.openrewrite:rewrite-java-tck:${rewriteVersion}")
     testImplementation("org.openrewrite:rewrite-test:${rewriteVersion}")
     testImplementation("org.assertj:assertj-core:latest.release")
     testImplementation("org.junit.jupiter:junit-jupiter-api:latest.release")
