@@ -92,9 +92,10 @@ val rewriteVersion = if (project.hasProperty("releasing")) {
 }
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
-    implementation("org.openrewrite:rewrite-java:${rewriteVersion}")
-    implementation("org.openrewrite:rewrite-maven:${rewriteVersion}")
-    runtimeOnly("org.openrewrite:rewrite-java-11:${rewriteVersion}")
+    implementation(platform("org.openrewrite:rewrite-bom:${rewriteVersion}"))
+    implementation("org.openrewrite:rewrite-java")
+    implementation("org.openrewrite:rewrite-maven")
+    runtimeOnly("org.openrewrite:rewrite-java-11")
     runtimeOnly("com.fasterxml.jackson.core:jackson-core:latest.release")
 
     compileOnly("org.projectlombok:lombok:latest.release")
@@ -102,9 +103,9 @@ dependencies {
 
     testImplementation("org.jetbrains.kotlin:kotlin-reflect")
     testImplementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    testImplementation("org.openrewrite:rewrite-java-11:${rewriteVersion}")
-    testImplementation("org.openrewrite:rewrite-java-tck:${rewriteVersion}")
-    testImplementation("org.openrewrite:rewrite-test:${rewriteVersion}")
+    testImplementation("org.openrewrite:rewrite-java-11")
+    testImplementation("org.openrewrite:rewrite-java-tck")
+    testImplementation("org.openrewrite:rewrite-test")
     testImplementation("org.assertj:assertj-core:latest.release")
     testImplementation("org.junit.jupiter:junit-jupiter-api:latest.release")
     testImplementation("org.junit.jupiter:junit-jupiter-params:latest.release")
