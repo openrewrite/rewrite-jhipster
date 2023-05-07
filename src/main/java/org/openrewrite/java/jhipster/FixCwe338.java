@@ -15,15 +15,14 @@
  */
 package org.openrewrite.java.jhipster;
 
-import org.openrewrite.ExecutionContext;
-import org.openrewrite.Parser;
-import org.openrewrite.Recipe;
+import org.openrewrite.*;
 import org.openrewrite.java.JavaIsoVisitor;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.java.JavaTemplate;
 import org.openrewrite.java.format.AutoFormat;
 import org.openrewrite.java.tree.J;
 import org.openrewrite.java.tree.Statement;
+import org.openrewrite.marker.SearchResult;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -34,7 +33,7 @@ import static java.util.stream.Collectors.toList;
 
 public class FixCwe338 extends Recipe {
 
-    private static final ThreadLocal<JavaParser> JAVA_PARSER = ThreadLocal.withInitial(() ->
+    private static final JavaParser.Builder<?, ?> JAVA_PARSER =
             JavaParser.fromJavaVersion()
                     .dependsOn(Arrays.asList(
                             Parser.Input.fromString(
@@ -49,8 +48,7 @@ public class FixCwe338 extends Recipe {
                                             "public class RandomStringUtils {\n" +
                                             "  public static String random(int count, int start, int end, boolean letters, boolean numbers, char[] chars, Random random) {}\n" +
                                             "}\n"
-                            )))
-                    .build());
+                            )));
 
     private static final String COMMONS_LANG_2 = "COMMONS_LANG_2";
 
@@ -70,9 +68,8 @@ public class FixCwe338 extends Recipe {
     }
 
     @Override
-    protected JavaIsoVisitor<ExecutionContext> getSingleSourceApplicableTest() {
-        // Look for classes named RandomUtil
-        return new JavaIsoVisitor<ExecutionContext>() {
+    public TreeVisitor<?, ExecutionContext> getVisitor() {
+        return Preconditions.check(new JavaIsoVisitor<ExecutionContext>() {
             @Override
             public J.CompilationUnit visitCompilationUnit(J.CompilationUnit cu, ExecutionContext ctx) {
                 if (cu.getPackageDeclaration() == null) {
@@ -84,16 +81,11 @@ public class FixCwe338 extends Recipe {
             @Override
             public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration cd, ExecutionContext ctx) {
                 if ("RandomUtil".equals(cd.getSimpleName())) {
-                    return cd.withMarkers(cd.getMarkers().searchResult());
+                    return SearchResult.found(cd);
                 }
                 return cd;
             }
-        };
-    }
-
-    @Override
-    protected JavaIsoVisitor<ExecutionContext> getVisitor() {
-        return new JavaIsoVisitor<ExecutionContext>() {
+        }, new JavaIsoVisitor<ExecutionContext>() {
             @Override
             public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext ctx) {
                 // If the SECURE_RANDOM field already exists the refactoring has already been completed
@@ -118,15 +110,15 @@ public class FixCwe338 extends Recipe {
                 // Putting the method first because we're going to move the fields & initializer to the start of the class in the next step
                 cd = cd.withBody(cd.getBody().withTemplate(
                         JavaTemplate.builder(this::getCursor, "private static String generateRandomAlphanumericString() {\n" +
-                                "    return RandomStringUtils.random(DEF_COUNT, 0, 0, true, true, null, SECURE_RANDOM);\n" +
-                                "}\n" +
-                                "private static final SecureRandom SECURE_RANDOM = new SecureRandom();\n" +
-                                "private static final int DEF_COUNT = 20;\n\n" +
-                                "static {\n" +
-                                "    SECURE_RANDOM.nextBytes(new byte[64]);\n" +
-                                "}\n"
-                        )
-                                .javaParser(JAVA_PARSER::get)
+                                        "    return RandomStringUtils.random(DEF_COUNT, 0, 0, true, true, null, SECURE_RANDOM);\n" +
+                                        "}\n" +
+                                        "private static final SecureRandom SECURE_RANDOM = new SecureRandom();\n" +
+                                        "private static final int DEF_COUNT = 20;\n\n" +
+                                        "static {\n" +
+                                        "    SECURE_RANDOM.nextBytes(new byte[64]);\n" +
+                                        "}\n"
+                                )
+                                .javaParser(JAVA_PARSER)
                                 .imports("java.security.SecureRandom")
                                 .build(),
                         cd.getBody().getCoordinates().lastStatement()));
@@ -163,10 +155,10 @@ public class FixCwe338 extends Recipe {
             @Override
             public J.MethodInvocation visitMethodInvocation(J.MethodInvocation m, ExecutionContext ctx) {
                 return m.withTemplate(JavaTemplate.builder(this::getCursor, "generateRandomAlphanumericString()")
-                                .javaParser(JAVA_PARSER::get)
+                                .javaParser(JAVA_PARSER)
                                 .build(),
                         m.getCoordinates().replace());
             }
-        };
+        });
     }
 }
