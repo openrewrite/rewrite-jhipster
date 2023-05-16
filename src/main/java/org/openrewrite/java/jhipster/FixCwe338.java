@@ -109,7 +109,7 @@ public class FixCwe338 extends Recipe {
                 // Add method, fields, static initializer
                 // Putting the method first because we're going to move the fields & initializer to the start of the class in the next step
                 cd = cd.withBody(cd.getBody().withTemplate(
-                        JavaTemplate.builder(this::getCursor, "private static String generateRandomAlphanumericString() {\n" +
+                        JavaTemplate.builder("private static String generateRandomAlphanumericString() {\n" +
                                         "    return RandomStringUtils.random(DEF_COUNT, 0, 0, true, true, null, SECURE_RANDOM);\n" +
                                         "}\n" +
                                         "private static final SecureRandom SECURE_RANDOM = new SecureRandom();\n" +
@@ -118,9 +118,11 @@ public class FixCwe338 extends Recipe {
                                         "    SECURE_RANDOM.nextBytes(new byte[64]);\n" +
                                         "}\n"
                                 )
+                                .context(getCursor())
                                 .javaParser(JAVA_PARSER)
                                 .imports("java.security.SecureRandom")
                                 .build(),
+                        getCursor(),
                         cd.getBody().getCoordinates().lastStatement()));
                 maybeAddImport("java.security.SecureRandom");
 
@@ -154,9 +156,11 @@ public class FixCwe338 extends Recipe {
 
             @Override
             public J.MethodInvocation visitMethodInvocation(J.MethodInvocation m, ExecutionContext ctx) {
-                return m.withTemplate(JavaTemplate.builder(this::getCursor, "generateRandomAlphanumericString()")
+                return m.withTemplate(JavaTemplate.builder("generateRandomAlphanumericString()")
+                                .context(getCursor())
                                 .javaParser(JAVA_PARSER)
                                 .build(),
+                        getCursor(),
                         m.getCoordinates().replace());
             }
         });
