@@ -20,6 +20,7 @@ import org.openrewrite.java.JavaIsoVisitor;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.java.JavaTemplate;
 import org.openrewrite.java.format.AutoFormat;
+import org.openrewrite.java.format.AutoFormatVisitor;
 import org.openrewrite.java.tree.J;
 import org.openrewrite.java.tree.Statement;
 import org.openrewrite.marker.SearchResult;
@@ -142,7 +143,7 @@ public class FixCwe338 extends Recipe {
                     randomStringUtilsFqn = "org.apache.commons.lang.RandomStringUtils";
                 }
                 maybeAddImport(randomStringUtilsFqn);
-                doAfterVisit(new AutoFormat());
+                doAfterVisit(new AutoFormatVisitor<>());
                 return cd;
             }
 
