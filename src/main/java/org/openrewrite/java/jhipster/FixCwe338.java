@@ -19,7 +19,6 @@ import org.openrewrite.*;
 import org.openrewrite.java.JavaIsoVisitor;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.java.JavaTemplate;
-import org.openrewrite.java.format.AutoFormat;
 import org.openrewrite.java.format.AutoFormatVisitor;
 import org.openrewrite.java.tree.J;
 import org.openrewrite.java.tree.Statement;
@@ -39,16 +38,16 @@ public class FixCwe338 extends Recipe {
                     .dependsOn(Arrays.asList(
                             Parser.Input.fromString(
                                     "package org.apache.commons.lang;\n" +
-                                            "import java.util.Random;\n" +
-                                            "public class RandomStringUtils {\n" +
-                                            "  public static String random(int count, int start, int end, boolean letters, boolean numbers, char[] chars, Random random) {}\n" +
-                                            "}\n"),
+                                    "import java.util.Random;\n" +
+                                    "public class RandomStringUtils {\n" +
+                                    "  public static String random(int count, int start, int end, boolean letters, boolean numbers, char[] chars, Random random) {}\n" +
+                                    "}\n"),
                             Parser.Input.fromString(
                                     "package org.apache.commons.lang3;\n" +
-                                            "import java.util.Random;\n" +
-                                            "public class RandomStringUtils {\n" +
-                                            "  public static String random(int count, int start, int end, boolean letters, boolean numbers, char[] chars, Random random) {}\n" +
-                                            "}\n"
+                                    "import java.util.Random;\n" +
+                                    "public class RandomStringUtils {\n" +
+                                    "  public static String random(int count, int start, int end, boolean letters, boolean numbers, char[] chars, Random random) {}\n" +
+                                    "}\n"
                             )));
 
     private static final String COMMONS_LANG_2 = "COMMONS_LANG_2";
@@ -109,22 +108,21 @@ public class FixCwe338 extends Recipe {
 
                 // Add method, fields, static initializer
                 // Putting the method first because we're going to move the fields & initializer to the start of the class in the next step
-                cd = cd.withBody(cd.getBody().withTemplate(
-                        JavaTemplate.builder("private static String generateRandomAlphanumericString() {\n" +
-                                        "    return RandomStringUtils.random(DEF_COUNT, 0, 0, true, true, null, SECURE_RANDOM);\n" +
-                                        "}\n" +
-                                        "private static final SecureRandom SECURE_RANDOM = new SecureRandom();\n" +
-                                        "private static final int DEF_COUNT = 20;\n\n" +
-                                        "static {\n" +
-                                        "    SECURE_RANDOM.nextBytes(new byte[64]);\n" +
-                                        "}\n"
-                                )
-                                .context(getCursor())
-                                .javaParser(JAVA_PARSER)
-                                .imports("java.security.SecureRandom")
-                                .build(),
-                        getCursor(),
-                        cd.getBody().getCoordinates().lastStatement()));
+                cd = cd.withBody(JavaTemplate.builder("private static String generateRandomAlphanumericString() {\n" +
+                                                      "    return RandomStringUtils.random(DEF_COUNT, 0, 0, true, true, null, SECURE_RANDOM);\n" +
+                                                      "}\n" +
+                                                      "private static final SecureRandom SECURE_RANDOM = new SecureRandom();\n" +
+                                                      "private static final int DEF_COUNT = 20;\n\n" +
+                                                      "static {\n" +
+                                                      "    SECURE_RANDOM.nextBytes(new byte[64]);\n" +
+                                                      "}\n"
+                        )
+                        .contextSensitive()
+                        .javaParser(JAVA_PARSER)
+                        .imports("java.security.SecureRandom")
+                        .build()
+                        .apply(new Cursor(new Cursor(getCursor().getParent(), cd), cd.getBody()),
+                                cd.getBody().getCoordinates().lastStatement()));
                 maybeAddImport("java.security.SecureRandom");
 
                 // Move the fields and static initializer newly added statements to the beginning of the class body
@@ -157,12 +155,10 @@ public class FixCwe338 extends Recipe {
 
             @Override
             public J.MethodInvocation visitMethodInvocation(J.MethodInvocation m, ExecutionContext ctx) {
-                return m.withTemplate(JavaTemplate.builder("generateRandomAlphanumericString()")
-                                .context(getCursor())
-                                .javaParser(JAVA_PARSER)
-                                .build(),
-                        getCursor(),
-                        m.getCoordinates().replace());
+                return JavaTemplate.builder("generateRandomAlphanumericString()")
+                        .contextSensitive()
+                        .javaParser(JAVA_PARSER)
+                        .build().apply(getCursor(), m.getCoordinates().replace());
             }
         });
     }
