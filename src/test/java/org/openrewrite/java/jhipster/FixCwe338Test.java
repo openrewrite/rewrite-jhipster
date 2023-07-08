@@ -16,6 +16,7 @@
 package org.openrewrite.java.jhipster;
 
 import org.junit.jupiter.api.Test;
+import org.openrewrite.DocumentExample;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
@@ -33,6 +34,7 @@ class FixCwe338Test implements RewriteTest {
                 .recipe(new FixCwe338());
     }
 
+    @DocumentExample
     @Test
     void cwe338CommonsLang2() {
         rewriteRun(
