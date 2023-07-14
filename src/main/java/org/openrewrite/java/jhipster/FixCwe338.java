@@ -33,23 +33,6 @@ import static java.util.stream.Collectors.toList;
 
 public class FixCwe338 extends Recipe {
 
-    private static final JavaParser.Builder<?, ?> JAVA_PARSER =
-            JavaParser.fromJavaVersion()
-                    .dependsOn(Arrays.asList(
-                            Parser.Input.fromString(
-                                    "package org.apache.commons.lang;\n" +
-                                    "import java.util.Random;\n" +
-                                    "public class RandomStringUtils {\n" +
-                                    "  public static String random(int count, int start, int end, boolean letters, boolean numbers, char[] chars, Random random) {}\n" +
-                                    "}\n"),
-                            Parser.Input.fromString(
-                                    "package org.apache.commons.lang3;\n" +
-                                    "import java.util.Random;\n" +
-                                    "public class RandomStringUtils {\n" +
-                                    "  public static String random(int count, int start, int end, boolean letters, boolean numbers, char[] chars, Random random) {}\n" +
-                                    "}\n"
-                            )));
-
     private static final String COMMONS_LANG_2 = "COMMONS_LANG_2";
 
     @Override
@@ -65,6 +48,24 @@ public class FixCwe338 extends Recipe {
     @Override
     public Duration getEstimatedEffortPerOccurrence() {
         return Duration.ofMinutes(5);
+    }
+
+    private JavaParser.Builder<?, ?> javaParser() {
+        return JavaParser.fromJavaVersion()
+                .dependsOn(Arrays.asList(
+                        Parser.Input.fromString(
+                                "package org.apache.commons.lang;\n" +
+                                "import java.util.Random;\n" +
+                                "public class RandomStringUtils {\n" +
+                                "  public static String random(int count, int start, int end, boolean letters, boolean numbers, char[] chars, Random random) {}\n" +
+                                "}\n"),
+                        Parser.Input.fromString(
+                                "package org.apache.commons.lang3;\n" +
+                                "import java.util.Random;\n" +
+                                "public class RandomStringUtils {\n" +
+                                "  public static String random(int count, int start, int end, boolean letters, boolean numbers, char[] chars, Random random) {}\n" +
+                                "}\n"
+                        )));
     }
 
     @Override
@@ -118,7 +119,7 @@ public class FixCwe338 extends Recipe {
                                                       "}\n"
                         )
                         .contextSensitive()
-                        .javaParser(JAVA_PARSER)
+                        .javaParser(javaParser())
                         .imports("java.security.SecureRandom")
                         .build()
                         .apply(new Cursor(new Cursor(getCursor().getParent(), cd), cd.getBody()),
@@ -157,7 +158,7 @@ public class FixCwe338 extends Recipe {
             public J.MethodInvocation visitMethodInvocation(J.MethodInvocation m, ExecutionContext ctx) {
                 return JavaTemplate.builder("generateRandomAlphanumericString()")
                         .contextSensitive()
-                        .javaParser(JAVA_PARSER)
+                        .javaParser(javaParser())
                         .build().apply(getCursor(), m.getCoordinates().replace());
             }
         });
