@@ -13,3 +13,7 @@ This project implements a [Rewrite module](https://github.com/openrewrite/rewrit
 Browse [a selection of recipes available through this module in the recipe catalog](https://docs.openrewrite.org/recipes/java/jhipster).
 
 See the [related issue on generator-jhipster](https://github.com/jhipster/generator-jhipster/issues/15068).
+
+## Contributing
+
+We appreciate all types of contributions. See the [contributing guide](https://github.com/openrewrite/.github/blob/main/CONTRIBUTING.md) for detailed instructions on how to get started.
